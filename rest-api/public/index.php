@@ -19,7 +19,7 @@ $app->get('/', function (Request $request, Response $response) {
    return $response;
 });
 
-$app->get('/country-data/all', function (Request $request, Response $response) {
+$app->get('/city-data', function (Request $request, Response $response) {
    $sql = "SELECT * FROM cities";
   
    try {
