@@ -33,7 +33,7 @@ $app->get('/city-data', function (Request $request, Response $response) {
      return $response
        ->withHeader('content-type', 'application/json')
        ->withStatus(200);
-   } catch (PDOException $e) {
+    } catch (PDOException $e) {
      $error = array(
        "message" => $e->getMessage()
      );
@@ -42,7 +42,36 @@ $app->get('/city-data', function (Request $request, Response $response) {
      return $response
        ->withHeader('content-type', 'application/json')
        ->withStatus(500);
-   }
+    }
+  });
+
+  $app->get('/city-data/{cityId}', function (Request $request, Response $response, $args) {
+    
+    $cityId = $args['cityId'];
+    $sql = "SELECT * FROM cities WHERE cityId = :cityId";
+   
+    try {
+      $db = new db();
+      $conn = $db->connect();
+      $stmt = $conn->prepare($sql);
+      $stmt->execute([":cityId"=>$cityId]);
+      $customers = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+     
+      $response->getBody()->write(json_encode($customers));
+      return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+     } catch (PDOException $e) {
+      $error = array(
+        "message" => $e->getMessage()
+      );
+   
+      $response->getBody()->write(json_encode($error));
+      return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(500);
+     }
   });
 
 $app->run();
