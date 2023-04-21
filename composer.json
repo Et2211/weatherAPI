@@ -2,7 +2,7 @@
     "name": "eshar/rest-api",
     "autoload": {
         "psr-4": {
-            "App\\": "src"
+            "App\\": "rest-api/src"
         }
     },
     "authors": [
