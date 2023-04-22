@@ -8,6 +8,10 @@ use Slim\Factory\AppFactory;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+$dotenv = Dotenv\Dotenv::createImmutable('C:\xampp\htdocs\weatherAPI');
+$dotenv->load();
+
+
 $app = AppFactory::create();
 
 $app->addRoutingMiddleware();
@@ -49,7 +53,6 @@ $app->get('/city-data', function (Request $request, Response $response) {
     
     $cityId = $args['cityId'];
     $sql = "SELECT * FROM cities WHERE cityId = :cityId";
-   
     try {
       $db = new db();
       $conn = $db->connect();
@@ -57,7 +60,7 @@ $app->get('/city-data', function (Request $request, Response $response) {
       $stmt->execute([":cityId"=>$cityId]);
       $cityData = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
-     
+
       $lat = $cityData[0]->lat;
       $lon = $cityData[0]->lon;
 
