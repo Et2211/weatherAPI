@@ -55,10 +55,22 @@ $app->get('/city-data', function (Request $request, Response $response) {
       $conn = $db->connect();
       $stmt = $conn->prepare($sql);
       $stmt->execute([":cityId"=>$cityId]);
-      $customers = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $cityData = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
      
-      $response->getBody()->write(json_encode($customers));
+      $lat = $cityData[0]->lat;
+      $lon = $cityData[0]->lon;
+
+
+      $client = new GuzzleHttp\Client(['verify' => 'C:\xampp\php\extras\ssl\cacert.pem']);
+      $res = $client->request('GET', 'https://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lon.'&appid='.$_ENV["OPENWEATHER_APIKEY"], []);
+      
+      if ($res->getStatusCode() == 200) {
+        $data = json_decode($res->getBody());
+      }
+
+ 
+      $response->getBody()->write(json_encode($data));
       return $response
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
