@@ -69,7 +69,7 @@ $app->get('/city-data', function (Request $request, Response $response) {
         
         
         $client = new GuzzleHttp\Client(['verify' => 'C:\xampp\php\extras\ssl\cacert.pem']);
-        $res = $client->request('GET', 'https://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lon.'&appid='.$_ENV["OPENWEATHER_APIKEY"], []);
+        $res = $client->request('GET', 'https://api.openweathermap.org/data/2.5/forecast?lat='.$lat.'&lon='.$lon.'&appid='.$_ENV["OPENWEATHER_APIKEY"], []);
         
         if ($res->getStatusCode() == 200) {
           $data = json_decode($res->getBody());
