@@ -61,32 +61,45 @@ $app->get('/city-data', function (Request $request, Response $response) {
       $cityData = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
 
-      $lat = $cityData[0]->lat;
-      $lon = $cityData[0]->lon;
+      if ($cityData) {
 
-
-      $client = new GuzzleHttp\Client(['verify' => 'C:\xampp\php\extras\ssl\cacert.pem']);
-      $res = $client->request('GET', 'https://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lon.'&appid='.$_ENV["OPENWEATHER_APIKEY"], []);
-      
-      if ($res->getStatusCode() == 200) {
-        $data = json_decode($res->getBody());
-      }
-
- 
-      $response->getBody()->write(json_encode($data));
-      return $response
+        
+        $lat = $cityData[0]->lat;
+        $lon = $cityData[0]->lon;
+        
+        
+        $client = new GuzzleHttp\Client(['verify' => 'C:\xampp\php\extras\ssl\cacert.pem']);
+        $res = $client->request('GET', 'https://api.openweathermap.org/data/2.5/weather?lat='.$lat.'&lon='.$lon.'&appid='.$_ENV["OPENWEATHER_APIKEY"], []);
+        
+        if ($res->getStatusCode() == 200) {
+          $data = json_decode($res->getBody());
+        }
+        
+        
+        $response->getBody()->write(json_encode($data));
+        return $response
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
-     } catch (PDOException $e) {
-      $error = array(
-        "message" => $e->getMessage()
-      );
-   
-      $response->getBody()->write(json_encode($error));
-      return $response
+      } else {
+        $error = array(
+          "error" => 'Unknown location'
+        );
+        
+        $response->getBody()->write(json_encode($error));
+        return $response
         ->withHeader('content-type', 'application/json')
         ->withStatus(500);
-     }
-  });
-
+      }
+      } catch (PDOException $e) {
+        $error = array(
+          "message" => $e->getMessage()
+        );
+        
+        $response->getBody()->write(json_encode($error));
+        return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(500);
+      }
+    });
+    
 $app->run();
