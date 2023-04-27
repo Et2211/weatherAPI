@@ -105,5 +105,37 @@ $app->get('/city-data', function (Request $request, Response $response) {
         ->withStatus(500);
       }
     });
+
+    $app->get('/get-weather/{cityName}', function (Request $request, Response $response, $args) {
+      $cityName = $args['cityName'];
+    
+
+      try {
+   
+          $client = new GuzzleHttp\Client(['verify' => 'C:\xampp\php\extras\ssl\cacert.pem']);
+          $res = $client->request('GET', 'https://api.openweathermap.org/data/2.5/forecast?q='.$cityName.'&appid='.$_ENV["OPENWEATHER_APIKEY"], []);
+          
+          if ($res->getStatusCode() == 200) {
+            $data = json_decode($res->getBody());
+          }
+          
+          
+          $response->getBody()->write(json_encode($data));
+          return $response
+          ->withHeader('content-type', 'application/json')
+          ->withStatus(200);
+
+        } catch (GuzzleHttp\Exception\ClientException  $e) {
+          $error = array(
+            'error' => true,
+            'message' => 'Location does not exist'
+          );
+          
+          $response->getBody()->write(json_encode($error));
+          return $response
+          ->withHeader('content-type', 'application/json')
+          ->withStatus(404);
+        }
+      });
     
 $app->run();
